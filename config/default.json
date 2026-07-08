@@ -1,0 +1,37 @@
+{
+  "duration_s": 1800,
+  "activities": ["write", "browse", "idle", "switch"],
+  "activity_weights": { "write": 3, "browse": 2, "idle": 2, "switch": 1 },
+  "sandbox_dir": "",
+  "killswitch": "<ctrl>+<alt>+q",
+  "takeover_cooldown_s": 6.0,
+  "log_level": "INFO",
+  "logfile": "",
+  "editor_cmd": "",
+  "filemanager_cmd": "",
+  "seed": 0,
+  "mouse": {
+    "tremor_px": 1.2,
+    "curvature": 0.18,
+    "overshoot_chance": 0.2,
+    "min_duration_s": 0.28,
+    "max_duration_s": 1.4,
+    "steps_per_100px": 14.0
+  },
+  "typing": {
+    "wpm": 55.0,
+    "wpm_jitter": 0.4,
+    "typo_rate": 0.04,
+    "uncorrected_typo_fraction": 0.1,
+    "think_pause_min_s": 0.4,
+    "think_pause_max_s": 1.8
+  },
+  "schedule": {
+    "min_activity_gap_s": 0.5,
+    "max_activity_gap_s": 3.0,
+    "break_chance": 0.15,
+    "break_min_s": 5.0,
+    "break_max_s": 25.0,
+    "repeat_penalty": 0.35
+  }
+}

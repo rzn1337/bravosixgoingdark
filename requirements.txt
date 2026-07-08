@@ -1,0 +1,5 @@
+# Runtime dependency (the only one).
+pynput>=1.7
+
+# Dev-only (tests). Install with: pip install -r requirements-dev.txt
+# pytest>=7

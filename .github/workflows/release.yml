@@ -1,0 +1,59 @@
+name: build-release
+
+# Builds standalone executables for Windows and Linux and attaches them to a
+# GitHub Release. Triggered by pushing a version tag (e.g. v0.1.0), or run
+# manually from the Actions tab (which just uploads downloadable artifacts).
+on:
+  push:
+    tags: ["v*"]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: windows-latest
+            artifact: humansim-windows.exe
+            built: dist/humansim.exe
+          - os: ubuntu-22.04
+            artifact: humansim-linux
+            built: dist/humansim
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install pynput pyinstaller
+
+      - name: Build executable
+        run: pyinstaller humansim.spec
+
+      - name: Stage artifact
+        shell: bash
+        run: |
+          mkdir -p out
+          cp "${{ matrix.built }}" "out/${{ matrix.artifact }}"
+
+      - name: Upload workflow artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ matrix.artifact }}
+          path: out/${{ matrix.artifact }}
+
+      - name: Attach to release
+        if: startsWith(github.ref, 'refs/tags/')
+        uses: softprops/action-gh-release@v2
+        with:
+          files: out/${{ matrix.artifact }}
+          generate_release_notes: true
