@@ -1,7 +1,7 @@
 import random
 
-from humansim.config import Settings
-from humansim.engine.scheduler import Scheduler
+from b6gd.config import Settings
+from b6gd.engine.scheduler import Scheduler
 
 
 def test_only_picks_available():

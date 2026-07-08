@@ -1,6 +1,6 @@
 import pytest
 
-from humansim.util.duration import format_duration, parse_duration
+from b6gd.util.duration import format_duration, parse_duration
 
 
 def test_parse_units():

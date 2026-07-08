@@ -97,7 +97,7 @@ class Apps:
 
     def filemanager_title_hints(self):
         if self.info.is_windows:
-            return ["File Explorer", "Explorer", "HumanSimWorkspace"]
+            return ["File Explorer", "Explorer", "B6GDWorkspace"]
         if self.info.is_mac:
             return ["Finder"]
-        return ["Files", "Nautilus", "Nemo", "Dolphin", "Thunar", "HumanSimWorkspace"]
+        return ["Files", "Nautilus", "Nemo", "Dolphin", "Thunar", "B6GDWorkspace"]

@@ -1,4 +1,4 @@
-from humansim.safety.control import Control
+from b6gd.safety.control import Control
 
 
 def test_wait_completes_when_running():

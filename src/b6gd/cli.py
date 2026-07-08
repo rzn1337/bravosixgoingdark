@@ -17,10 +17,10 @@ from .util.logging import setup_logging
 
 def build_parser() -> argparse.ArgumentParser:
     p = argparse.ArgumentParser(
-        prog="humansim",
+        prog="b6gd",
         description="Lightweight cross-platform human-activity simulator (personal use).",
     )
-    p.add_argument("--version", action="version", version=f"humansim {__version__}")
+    p.add_argument("--version", action="version", version=f"b6gd {__version__}")
     sub = p.add_subparsers(dest="command", required=True)
 
     def add_common(sp):
@@ -28,7 +28,7 @@ def build_parser() -> argparse.ArgumentParser:
         sp.add_argument(
             "--activities", help="comma list: write,browse,idle,switch"
         )
-        sp.add_argument("--sandbox", help="workspace dir (default ~/HumanSimWorkspace)")
+        sp.add_argument("--sandbox", help="workspace dir (default ~/B6GDWorkspace)")
         sp.add_argument("--config", help="path to a JSON settings file")
         sp.add_argument("--log-level", help="DEBUG/INFO/WARNING")
         sp.add_argument("--killswitch", help="pynput hotkey, e.g. '<ctrl>+<alt>+q'")
@@ -77,7 +77,7 @@ def cmd_doctor(settings) -> int:
     w, h = get_screen_size(info)
 
     lines = [
-        "HumanSim doctor",
+        "B6GD doctor",
         "=" * 40,
         f"version        : {__version__}",
         f"python         : {platform.python_version()}",

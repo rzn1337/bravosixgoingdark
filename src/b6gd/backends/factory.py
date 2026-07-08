@@ -7,7 +7,7 @@ from .base import InputBackend
 
 WAYLAND_MESSAGE = (
     "You're on a Wayland session, which blocks normal synthetic input for "
-    "security.\nHumanSim needs one of:\n"
+    "security.\nB6GD needs one of:\n"
     "  1. Install ydotool and run its daemon:\n"
     "       sudo apt install ydotool\n"
     "       sudo systemctl enable --now ydotool    # or: sudo ydotoold &\n"

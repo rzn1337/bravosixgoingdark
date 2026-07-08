@@ -1,7 +1,7 @@
 import random
 
-from humansim.config import TypingSettings
-from humansim.humanize.typing import plan_typing, planned_duration
+from b6gd.config import TypingSettings
+from b6gd.humanize.typing import plan_typing, planned_duration
 
 
 def _chars(events):

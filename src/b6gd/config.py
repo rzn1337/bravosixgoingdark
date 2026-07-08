@@ -44,7 +44,7 @@ class Settings:
     activity_weights: dict = field(
         default_factory=lambda: {"write": 3, "browse": 2, "idle": 2, "switch": 1}
     )
-    sandbox_dir: str = ""  # empty => default ~/HumanSimWorkspace
+    sandbox_dir: str = ""  # empty => default ~/B6GDWorkspace
     killswitch: str = "<ctrl>+<alt>+q"
     takeover_cooldown_s: float = 6.0
     log_level: str = "INFO"
@@ -58,7 +58,7 @@ class Settings:
 
 
 def default_sandbox() -> str:
-    return os.path.join(os.path.expanduser("~"), "HumanSimWorkspace")
+    return os.path.join(os.path.expanduser("~"), "B6GDWorkspace")
 
 
 def _merge(target, data: dict) -> None:

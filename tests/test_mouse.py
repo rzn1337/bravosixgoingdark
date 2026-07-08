@@ -1,7 +1,7 @@
 import random
 
-from humansim.config import MouseSettings
-from humansim.humanize.mouse import plan_move, random_point, screen_rect
+from b6gd.config import MouseSettings
+from b6gd.humanize.mouse import plan_move, random_point, screen_rect
 
 
 def test_lands_exactly_on_target():

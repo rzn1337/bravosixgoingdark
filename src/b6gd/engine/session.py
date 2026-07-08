@@ -65,7 +65,7 @@ class Session:
 
     def _banner(self) -> None:
         s = self.settings
-        self.log.info("HumanSim %s", __version__)
+        self.log.info("B6GD %s", __version__)
         self.log.info("  platform  : %s / %s", self.info.system, self.info.session_type)
         self.log.info(
             "  backend   : %s%s",

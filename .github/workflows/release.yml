@@ -1,7 +1,7 @@
 name: build-release
 
 # Builds standalone executables for Windows and Linux and attaches them to a
-# GitHub Release. Triggered by pushing a version tag (e.g. v0.1.0), or run
+# GitHub Release. Triggered by pushing a version tag (e.g. v0.2.0), or run
 # manually from the Actions tab (which just uploads downloadable artifacts).
 on:
   push:
@@ -18,11 +18,11 @@ jobs:
       matrix:
         include:
           - os: windows-latest
-            artifact: humansim-windows.exe
-            built: dist/humansim.exe
+            artifact: b6gd-windows.exe
+            built: dist/b6gd.exe
           - os: ubuntu-22.04
-            artifact: humansim-linux
-            built: dist/humansim
+            artifact: b6gd-linux
+            built: dist/b6gd
     runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v4
@@ -37,7 +37,7 @@ jobs:
           pip install pynput pyinstaller
 
       - name: Build executable
-        run: pyinstaller humansim.spec
+        run: pyinstaller b6gd.spec
 
       - name: Stage artifact
         shell: bash

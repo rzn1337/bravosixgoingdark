@@ -1,4 +1,4 @@
-# HumanSim
+# B6GD
 
 A lightweight, cross-platform simulator of natural human desktop activity —
 curved cursor movement, realistic typing, opening a notes app and writing into
@@ -13,23 +13,23 @@ You don't need Python or any code setup — grab the prebuilt executable from th
 repo's **[Releases](../../releases)** page:
 
 1. Download the file for your OS:
-   - **Windows:** `humansim-windows.exe`
-   - **Ubuntu / Linux:** `humansim-linux`
+   - **Windows:** `b6gd-windows.exe`
+   - **Ubuntu / Linux:** `b6gd-linux`
 2. Run it from a terminal.
 
 **Windows (PowerShell):**
 ```powershell
-.\humansim-windows.exe doctor
-.\humansim-windows.exe dry-run --duration 20s
-.\humansim-windows.exe run --duration 10m
+.\b6gd-windows.exe doctor
+.\b6gd-windows.exe dry-run --duration 20s
+.\b6gd-windows.exe run --duration 10m
 ```
 
 **Ubuntu:**
 ```bash
-chmod +x humansim-linux
-./humansim-linux doctor
-./humansim-linux dry-run --duration 20s
-./humansim-linux run --duration 10m
+chmod +x b6gd-linux
+./b6gd-linux doctor
+./b6gd-linux dry-run --duration 20s
+./b6gd-linux run --duration 10m
 ```
 
 Notes:
@@ -64,7 +64,7 @@ it must never touch your real files:
 - **Auto-pause on takeover:** the moment you move the real mouse or press a key,
   automation pauses; it resumes after a few seconds of no human input.
 - **Sandboxed workspace:** it only ever opens, types into, and browses files
-  inside `~/HumanSimWorkspace/` (created and seeded automatically). It never
+  inside `~/B6GDWorkspace/` (created and seeded automatically). It never
   navigates to or writes your real documents.
 - **Focus guard:** before typing, it confirms the editor it launched is actually
   in the foreground; otherwise it skips typing.
@@ -82,7 +82,7 @@ it must never touch your real files:
 # From the project folder:
 python -m pip install -r requirements.txt      # installs pynput
 # ...or install as a command:
-python -m pip install -e .                      # gives you the `humansim` command
+python -m pip install -e .                      # gives you the `b6gd` command
 ```
 
 You can always run straight from source without installing:
@@ -203,7 +203,7 @@ python -m pytest            # pure-function tests; no display needed
 
 ```bash
 python -m pip install pynput pyinstaller
-pyinstaller humansim.spec   # produces dist/humansim(.exe)
+pyinstaller b6gd.spec   # produces dist/b6gd(.exe)
 ```
 
 Note: PyInstaller can't cross-compile — build the Windows `.exe` on Windows and
@@ -213,7 +213,7 @@ tag push.
 ## Project layout
 
 ```
-src/humansim/
+src/b6gd/
   cli.py  config.py  platform_detect.py  screen.py  apps.py
   backends/   humanize/   activities/   content/   engine/   safety/   util/
 assets/corpus/     # offline text for note generation

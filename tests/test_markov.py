@@ -1,7 +1,7 @@
 import random
 
-from humansim.content import ContentGen
-from humansim.content.markov import Markov
+from b6gd.content import ContentGen
+from b6gd.content.markov import Markov
 
 
 def test_markov_generates_sentence():

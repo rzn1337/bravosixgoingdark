@@ -1,12 +1,12 @@
 # -*- mode: python ; coding: utf-8 -*-
-# Builds a single-file `humansim` executable (humansim.exe on Windows).
-#   pyinstaller humansim.spec
+# Builds a single-file `b6gd` executable (b6gd.exe on Windows).
+#   pyinstaller b6gd.spec
 from PyInstaller.utils.hooks import collect_submodules
 
 hiddenimports = collect_submodules("pynput")
 
 a = Analysis(
-    ["humansim_main.py"],
+    ["b6gd_main.py"],
     pathex=["src"],
     binaries=[],
     datas=[("assets/corpus", "assets/corpus")],
@@ -25,7 +25,7 @@ exe = EXE(
     a.binaries,
     a.datas,
     [],
-    name="humansim",
+    name="b6gd",
     debug=False,
     bootloader_ignore_signals=False,
     strip=False,

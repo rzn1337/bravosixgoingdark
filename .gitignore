@@ -8,5 +8,5 @@ dist/
 venv/
 .pytest_cache/
 # Local runtime workspace (never commit generated activity files)
-HumanSimWorkspace/
+B6GDWorkspace/
 *.log

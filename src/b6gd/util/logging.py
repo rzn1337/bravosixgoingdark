@@ -3,7 +3,7 @@ from __future__ import annotations
 import logging
 import sys
 
-_LOGGER_NAME = "humansim"
+_LOGGER_NAME = "b6gd"
 
 
 def setup_logging(level: str = "INFO", logfile: str | None = None) -> logging.Logger:
@@ -11,16 +11,16 @@ def setup_logging(level: str = "INFO", logfile: str | None = None) -> logging.Lo
     logger = logging.getLogger(_LOGGER_NAME)
     logger.setLevel(level.upper())
     # Avoid duplicate handlers if called twice.
-    if not any(getattr(h, "_humansim", False) for h in logger.handlers):
+    if not any(getattr(h, "_b6gd", False) for h in logger.handlers):
         fmt = logging.Formatter("%(asctime)s %(levelname)-7s %(message)s", "%H:%M:%S")
         ch = logging.StreamHandler(sys.stderr)
         ch.setFormatter(fmt)
-        ch._humansim = True  # type: ignore[attr-defined]
+        ch._b6gd = True  # type: ignore[attr-defined]
         logger.addHandler(ch)
         if logfile:
             fh = logging.FileHandler(logfile, encoding="utf-8")
             fh.setFormatter(fmt)
-            fh._humansim = True  # type: ignore[attr-defined]
+            fh._b6gd = True  # type: ignore[attr-defined]
             logger.addHandler(fh)
     logger.propagate = False
     return logger

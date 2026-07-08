@@ -23,9 +23,9 @@ class Sandbox:
     def _seed(self) -> None:
         seeds = {
             "README.txt": (
-                "HumanSim workspace\n"
+                "B6GD workspace\n"
                 "==================\n\n"
-                "This folder is a sandbox. HumanSim only ever opens, types into,\n"
+                "This folder is a sandbox. B6GD only ever opens, types into,\n"
                 "and browses files *inside here* — never your real documents.\n"
                 "It is safe to delete; it will be recreated on the next run.\n"
             ),
