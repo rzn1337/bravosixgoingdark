@@ -114,7 +114,12 @@ sudo udevadm control --reload-rules && sudo udevadm trigger
 sudo usermod -aG input "$USER"          # then log out/in
 ```
 
-The Wayland path is experimental; the simplest route is an Xorg session.
+The Wayland path is experimental, with two limitations: the global hotkey and
+auto-pause can't arm (pynput needs X), so stop with **`Ctrl`+`C`** or, from
+another terminal, **`touch ~/.b6gd_stop`**; and window focus can't be verified,
+so the `write` activity types only if you pass **`--assume-focus`**. For the full
+experience (hotkey kill-switch, auto-pause, no ydotool needed), use an **Xorg**
+session.
 
 ### macOS (best-effort)
 Grant your terminal **Accessibility** permission (System Settings → Privacy &

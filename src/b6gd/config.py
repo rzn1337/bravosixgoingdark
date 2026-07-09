@@ -51,6 +51,7 @@ class Settings:
     logfile: str = ""
     editor_cmd: str = ""  # override editor auto-detection
     filemanager_cmd: str = ""  # override file-manager auto-detection
+    assume_focus: bool = False  # type even when window focus can't be verified (Wayland)
     seed: int = 0  # 0 => nondeterministic
     mouse: MouseSettings = field(default_factory=MouseSettings)
     typing: TypingSettings = field(default_factory=TypingSettings)

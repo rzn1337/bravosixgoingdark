@@ -16,6 +16,19 @@ class FocusGuard:
         self._log = logger
         self._dry_run = dry_run
 
+    def can_detect(self) -> bool:
+        """Whether we can actually read the foreground window title here. False
+        on Wayland (xdotool is X11-only) or when no query tool is present."""
+        if self._dry_run:
+            return True
+        if self._info.is_windows or self._info.is_mac:
+            return True
+        if self._info.is_linux and self._info.session_type == "x11":
+            import shutil
+
+            return shutil.which("xdotool") is not None
+        return False
+
     def foreground_title(self) -> str:
         try:
             if self._info.is_windows:

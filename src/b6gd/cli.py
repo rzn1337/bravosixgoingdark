@@ -33,6 +33,13 @@ def build_parser() -> argparse.ArgumentParser:
         sp.add_argument("--log-level", help="DEBUG/INFO/WARNING")
         sp.add_argument("--killswitch", help="pynput hotkey, e.g. '<ctrl>+<alt>+q'")
         sp.add_argument("--seed", type=int, help="RNG seed for reproducible runs")
+        sp.add_argument(
+            "--assume-focus",
+            action="store_true",
+            default=None,
+            help="type into the just-launched editor even when window focus can't be "
+            "verified (e.g. Wayland). Only if you trust launched apps to grab focus.",
+        )
 
     add_common(sub.add_parser("run", help="live session (moves the real cursor/keyboard)"))
     add_common(
@@ -58,6 +65,8 @@ def _apply_overrides(settings, args):
         settings.killswitch = args.killswitch
     if getattr(args, "seed", None) is not None:
         settings.seed = args.seed
+    if getattr(args, "assume_focus", None):
+        settings.assume_focus = True
     return settings
 
 

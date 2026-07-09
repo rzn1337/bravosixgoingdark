@@ -24,12 +24,25 @@ class WriteNote(Activity):
             return
 
         hints = ctx.apps.editor_title_hints(path)
-        if not ctx.focus.wait_for(hints, timeout=6.0):
+        if ctx.focus.can_detect():
+            if not ctx.focus.wait_for(hints, timeout=6.0):
+                ctx.log.warning(
+                    "write: editor not detected in foreground — skipping typing "
+                    "(focus guard prevents stray keystrokes)."
+                )
+                return
+        elif not getattr(ctx.settings, "assume_focus", False):
             ctx.log.warning(
-                "write: editor not detected in foreground — skipping typing "
-                "(focus guard prevents stray keystrokes)."
+                "write: can't verify window focus on this session (e.g. Wayland) — "
+                "skipping typing to avoid stray keystrokes. Re-run with --assume-focus "
+                "to type into the just-launched editor anyway."
             )
             return
+        else:
+            ctx.log.warning(
+                "write: focus unverifiable — typing into the just-launched editor "
+                "(--assume-focus)."
+            )
 
         text = ctx.content.make_note()
         ctx.log.info("write: typing note (%d chars)", len(text))

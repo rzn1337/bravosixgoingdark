@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import os
 import random
 import time
 
@@ -9,7 +10,14 @@ from ..apps import Apps
 from ..backends import make_backend
 from ..content import ContentGen
 from ..platform_detect import detect
-from ..safety import Control, FocusGuard, KillSwitch, Sandbox, TakeoverGuard
+from ..safety import (
+    Control,
+    FocusGuard,
+    KillSwitch,
+    Sandbox,
+    StopFileWatcher,
+    TakeoverGuard,
+)
 from ..util.duration import format_duration as fmt
 from ..util.logging import get_logger
 from .context import Context
@@ -62,8 +70,13 @@ class Session:
         self.takeover = TakeoverGuard(
             self.control, settings.takeover_cooldown_s, self.info, self.log
         )
+        self.stopfile = StopFileWatcher(
+            self.control,
+            os.path.join(os.path.expanduser("~"), ".b6gd_stop"),
+            self.log,
+        )
 
-    def _banner(self) -> None:
+    def _banner(self, ks_armed: bool = False, tk_armed: bool = False) -> None:
         s = self.settings
         self.log.info("B6GD %s", __version__)
         self.log.info("  platform  : %s / %s", self.info.system, self.info.session_type)
@@ -83,10 +96,20 @@ class Session:
         )
         if self.dry_run:
             self.log.info("  stop      : Ctrl+C (no global hotkey in dry-run)")
-        else:
-            self.log.info(
-                "  stop      : %s  |  slam mouse to top-left corner  |  Ctrl+C",
-                s.killswitch,
+            return
+        stops = []
+        if ks_armed:
+            stops.append(s.killswitch)
+        if tk_armed:
+            stops.append("slam mouse to top-left corner")
+        stops.append("Ctrl+C")
+        stops.append("touch %s" % self.stopfile.path)
+        self.log.info("  stop      : %s", "  |  ".join(stops))
+        if not ks_armed:
+            self.log.warning(
+                "  note      : global hotkey & auto-pause aren't available on this "
+                "session; stop with Ctrl+C or `touch %s`.",
+                self.stopfile.path,
             )
 
     def run(self) -> int:
@@ -98,10 +121,12 @@ class Session:
             )
             return 1
 
-        self._banner()
+        ks_armed = tk_armed = False
         if not self.dry_run:
-            self.killswitch.start()
-            self.takeover.start()
+            ks_armed = self.killswitch.start()
+            tk_armed = self.takeover.start()
+            self.stopfile.start()
+        self._banner(ks_armed, tk_armed)
 
         start = time.monotonic()
         end = start + self.settings.duration_s
@@ -153,6 +178,7 @@ class Session:
         if not self.dry_run:
             self.killswitch.stop()
             self.takeover.stop()
+            self.stopfile.stop()
         for proc in self.ctx.tracked:
             try:
                 if proc is not None and proc.poll() is None:

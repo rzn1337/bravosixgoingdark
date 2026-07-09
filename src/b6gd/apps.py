@@ -3,6 +3,7 @@ from __future__ import annotations
 import os
 import shutil
 import subprocess
+import sys
 
 from .platform_detect import PlatformInfo
 
@@ -49,9 +50,26 @@ class Apps:
         self.filemanager = find_filemanager(info, settings.filemanager_cmd)
 
     # ---- launch -------------------------------------------------------
+    @staticmethod
+    def _child_env():
+        """Environment for launched system apps. In a PyInstaller onefile build,
+        LD_LIBRARY_PATH points at the bundle's temp dir, so child processes load
+        our bundled libraries (e.g. an older libcrypto) instead of the system
+        ones — which breaks apps like gnome-text-editor / nautilus. Restore the
+        original pre-bundle value so system apps launch correctly."""
+        env = dict(os.environ)
+        if getattr(sys, "frozen", False):
+            for var in ("LD_LIBRARY_PATH", "DYLD_LIBRARY_PATH"):
+                orig = env.get(var + "_ORIG")
+                if orig is not None:
+                    env[var] = orig
+                else:
+                    env.pop(var, None)
+        return env
+
     def _popen(self, cmd):
         try:
-            return subprocess.Popen(cmd)
+            return subprocess.Popen(cmd, env=self._child_env())
         except Exception as exc:
             self.log.warning("Failed to launch %s: %s", cmd, exc)
             return None
