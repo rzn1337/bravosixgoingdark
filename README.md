@@ -43,6 +43,45 @@ Notes:
 The executables are built automatically by GitHub Actions whenever a version tag
 (`v*`) is pushed — see [`.github/workflows/release.yml`](.github/workflows/release.yml).
 
+## Command reference
+
+Same three verbs everywhere: **`doctor`** (check setup) → **`dry-run`** (safe
+preview, nothing moves) → **`run`** (live). Add `--help` to any command to see
+every option.
+
+**Windows** (PowerShell, in the folder you downloaded the exe to):
+```powershell
+Unblock-File .\b6gd-windows.exe        # clear the "downloaded from internet" flag
+.\b6gd-windows.exe doctor
+.\b6gd-windows.exe dry-run --duration 30s
+.\b6gd-windows.exe run --duration 2m
+```
+
+**Linux — X11 / Xorg** (full features, no daemon needed):
+```bash
+chmod +x b6gd-linux
+./b6gd-linux doctor                    # expect: session type: x11
+./b6gd-linux dry-run --duration 30s
+./b6gd-linux run --duration 2m
+```
+
+**Linux — Wayland** (needs ydotool; hotkey/auto-pause are unavailable here):
+```bash
+sudo systemctl enable --now ydotool    # start the input daemon
+./b6gd-linux doctor                    # expect: backend (live): ydotool
+./b6gd-linux run --duration 2m --assume-focus
+```
+
+**Stop a run:** `Ctrl+Alt+Q` (Windows / X11), slam the mouse to the top-left
+corner, `Ctrl+C`, or from any terminal: `touch ~/.b6gd_stop`.
+
+**Common flags:** `--duration 30m|1h|90s` · `--activities write,browse,idle,switch`
+· `--sandbox <dir>` · `--seed 42` · `--config file.json` · `--log-level DEBUG`
+· `--assume-focus` (Wayland typing).
+
+**Where output goes:** generated notes land in `~/B6GDWorkspace/Notes/`
+(`%USERPROFILE%\B6GDWorkspace\Notes\` on Windows).
+
 ## Design goals
 
 - **Lightweight.** Exactly one third-party dependency (`pynput`); everything
