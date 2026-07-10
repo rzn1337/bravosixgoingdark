@@ -26,7 +26,17 @@ def build_parser() -> argparse.ArgumentParser:
     def add_common(sp):
         sp.add_argument("--duration", help="e.g. 30m, 1h, 90s (default 30m)")
         sp.add_argument(
-            "--activities", help="comma list: write,browse,idle,switch"
+            "--activities",
+            help="features to RUN (comma list): write,browse,idle,switch,watch",
+        )
+        sp.add_argument(
+            "--exclude", help="features to turn OFF (comma list), e.g. write,watch"
+        )
+        sp.add_argument(
+            "-i",
+            "--interactive",
+            action="store_true",
+            help="choose features interactively before the run starts",
         )
         sp.add_argument("--sandbox", help="workspace dir (default ~/B6GDWorkspace)")
         sp.add_argument("--config", help="path to a JSON settings file")
@@ -37,8 +47,13 @@ def build_parser() -> argparse.ArgumentParser:
             "--assume-focus",
             action="store_true",
             default=None,
-            help="type into the just-launched editor even when window focus can't be "
-            "verified (e.g. Wayland). Only if you trust launched apps to grab focus.",
+            help="(default) type even when window focus can't be verified (e.g. Wayland)",
+        )
+        sp.add_argument(
+            "--strict-focus",
+            action="store_true",
+            default=None,
+            help="only type when the editor's focus is verified (disables Wayland typing)",
         )
 
     add_common(sub.add_parser("run", help="live session (moves the real cursor/keyboard)"))
@@ -67,7 +82,40 @@ def _apply_overrides(settings, args):
         settings.seed = args.seed
     if getattr(args, "assume_focus", None):
         settings.assume_focus = True
+    if getattr(args, "strict_focus", None):
+        settings.assume_focus = False
     return settings
+
+
+def resolve_activities(all_names, selected, exclude):
+    """Final ordered activity list: start from ``selected`` (or all), keep only
+    known names, then drop anything in ``exclude``."""
+    base = [n for n in (selected or all_names) if n in all_names]
+    ex = {e for e in (exclude or [])}
+    return [n for n in base if n not in ex]
+
+
+def _interactive_select(all_names, preselected):
+    import sys
+
+    if not sys.stdin or not sys.stdin.isatty():
+        return preselected
+    sel = set(preselected)
+    print("Choose features to run — type names to toggle (comma/space separated),")
+    print("then press Enter to start:")
+    for n in all_names:
+        print("  [%s] %s" % ("x" if n in sel else " ", n))
+    try:
+        resp = input("> ").strip()
+    except EOFError:
+        return preselected
+    for tok in resp.replace(",", " ").split():
+        t = tok.strip().lower()
+        if t in all_names:
+            sel.discard(t) if t in sel else sel.add(t)
+    final = [n for n in all_names if n in sel]
+    print("Running:", ", ".join(final) if final else "(nothing selected)")
+    return final
 
 
 def cmd_doctor(settings) -> int:
@@ -152,6 +200,19 @@ def main(argv=None) -> int:
 
     if args.command == "doctor":
         return cmd_doctor(settings)
+
+    from .activities import REGISTRY
+
+    all_names = list(REGISTRY)
+    exclude = (
+        [a.strip() for a in args.exclude.split(",") if a.strip()]
+        if getattr(args, "exclude", None)
+        else []
+    )
+    settings.activities = resolve_activities(all_names, settings.activities, exclude)
+    if getattr(args, "interactive", False):
+        settings.activities = _interactive_select(all_names, settings.activities)
+
     if args.command == "dry-run":
         return _run_session(settings, dry_run=True)
     if args.command == "run":

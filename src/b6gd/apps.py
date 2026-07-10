@@ -74,20 +74,25 @@ class Apps:
             self.log.warning("Failed to launch %s: %s", cmd, exc)
             return None
 
-    def launch_editor(self, filepath: str):
+    def launch_editor(self, filepath: str | None = None):
         if self.dry_run:
-            self.log.info("[dry] would launch editor %s on %s", self.editor, filepath)
+            where = f" on {filepath}" if filepath else " (blank document)"
+            self.log.info("[dry] would launch editor %s%s", self.editor, where)
             return None
         if self.info.is_windows:
-            return self._popen([self.editor or "notepad.exe", filepath])
-        if self.info.is_mac:
-            return self._popen(["open", "-a", self.editor or "TextEdit", filepath])
-        if not self.editor:
+            cmd = [self.editor or "notepad.exe"]
+        elif self.info.is_mac:
+            cmd = ["open", "-a", self.editor or "TextEdit"]
+        elif not self.editor:
             self.log.warning(
                 "No text editor found. Install one of: %s", ", ".join(_LINUX_EDITORS)
             )
             return None
-        return self._popen([self.editor, filepath])
+        else:
+            cmd = [self.editor]
+        if filepath:
+            cmd.append(filepath)
+        return self._popen(cmd)
 
     def launch_filemanager(self, path: str):
         if self.dry_run:
@@ -99,12 +104,23 @@ class Apps:
             return self._popen(["open", path])
         return self._popen([self.filemanager or "xdg-open", path])
 
-    # ---- focus hints --------------------------------------------------
-    def editor_title_hints(self, filepath: str):
-        stem = os.path.splitext(os.path.basename(filepath))[0]
-        hints = [stem]
+    def launch_browser(self, url: str):
+        if self.dry_run:
+            self.log.info("[dry] would open browser at %s", url)
+            return None
         if self.info.is_windows:
-            hints += ["Notepad"]
+            return self._popen(["cmd", "/c", "start", "", url])
+        if self.info.is_mac:
+            return self._popen(["open", url])
+        return self._popen(["xdg-open", url])
+
+    # ---- focus hints --------------------------------------------------
+    def editor_title_hints(self, filepath: str | None = None):
+        hints = []
+        if filepath:
+            hints.append(os.path.splitext(os.path.basename(filepath))[0])
+        if self.info.is_windows:
+            hints += ["Notepad", "Untitled"]
         elif self.info.is_mac:
             hints += ["TextEdit"]
         else:
@@ -119,3 +135,15 @@ class Apps:
         if self.info.is_mac:
             return ["Finder"]
         return ["Files", "Nautilus", "Nemo", "Dolphin", "Thunar", "B6GDWorkspace"]
+
+    def browser_title_hints(self):
+        return [
+            "YouTube",
+            "Chrome",
+            "Firefox",
+            "Edge",
+            "Mozilla",
+            "Chromium",
+            "Brave",
+            "Opera",
+        ]

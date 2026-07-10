@@ -36,13 +36,34 @@ class ScheduleSettings:
 
 
 @dataclass
+class WatchSettings:
+    dwell_min_s: float = 45.0
+    dwell_max_s: float = 150.0
+    urls: list = field(
+        default_factory=lambda: [
+            "https://www.youtube.com/results?search_query=gohighlevel+automation+tutorial",
+            "https://www.youtube.com/results?search_query=n8n+workflow+tutorial",
+            "https://www.youtube.com/results?search_query=crm+automation+for+agencies",
+            "https://www.youtube.com/results?search_query=gohighlevel+workflows+setup",
+            "https://www.youtube.com/results?search_query=n8n+automation+examples",
+        ]
+    )
+
+
+@dataclass
 class Settings:
     duration_s: float = 1800.0
     activities: list = field(
-        default_factory=lambda: ["write", "browse", "idle", "switch"]
+        default_factory=lambda: ["write", "browse", "idle", "switch", "watch"]
     )
     activity_weights: dict = field(
-        default_factory=lambda: {"write": 3, "browse": 2, "idle": 2, "switch": 1}
+        default_factory=lambda: {
+            "write": 3,
+            "browse": 2,
+            "idle": 2,
+            "switch": 1,
+            "watch": 2,
+        }
     )
     sandbox_dir: str = ""  # empty => default ~/B6GDWorkspace
     killswitch: str = "<ctrl>+<alt>+q"
@@ -51,11 +72,12 @@ class Settings:
     logfile: str = ""
     editor_cmd: str = ""  # override editor auto-detection
     filemanager_cmd: str = ""  # override file-manager auto-detection
-    assume_focus: bool = False  # type even when window focus can't be verified (Wayland)
+    assume_focus: bool = True  # type even when window focus can't be verified (e.g. Wayland)
     seed: int = 0  # 0 => nondeterministic
     mouse: MouseSettings = field(default_factory=MouseSettings)
     typing: TypingSettings = field(default_factory=TypingSettings)
     schedule: ScheduleSettings = field(default_factory=ScheduleSettings)
+    watch: WatchSettings = field(default_factory=WatchSettings)
 
 
 def default_sandbox() -> str:

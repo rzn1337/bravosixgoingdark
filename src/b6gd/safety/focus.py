@@ -83,6 +83,72 @@ class FocusGuard:
         )
         return out.stdout.strip() if out.returncode == 0 else ""
 
+    def activate(self, title_hints) -> bool:
+        """Best-effort: raise/focus a window whose title matches a hint. Works on
+        Windows and X11; a no-op on Wayland/macOS (returns False)."""
+        if self._dry_run:
+            return True
+        hints = [h.lower() for h in title_hints if h]
+        if not hints:
+            return False
+        try:
+            if self._info.is_windows:
+                return self._activate_windows(hints)
+            if self._info.is_linux and self._info.session_type == "x11":
+                return self._activate_x11(hints)
+        except Exception:
+            return False
+        return False
+
+    def _activate_windows(self, hints) -> bool:
+        import ctypes
+        from ctypes import wintypes
+
+        user32 = ctypes.windll.user32
+        found = []
+        proto = ctypes.WINFUNCTYPE(wintypes.BOOL, wintypes.HWND, wintypes.LPARAM)
+
+        def _cb(hwnd, _lparam):
+            if not user32.IsWindowVisible(hwnd):
+                return True
+            n = user32.GetWindowTextLengthW(hwnd)
+            if n == 0:
+                return True
+            buf = ctypes.create_unicode_buffer(n + 1)
+            user32.GetWindowTextW(hwnd, buf, n + 1)
+            if any(h in buf.value.lower() for h in hints):
+                found.append(hwnd)
+                return False
+            return True
+
+        user32.EnumWindows(proto(_cb), 0)
+        if not found:
+            return False
+        hwnd = found[0]
+        user32.keybd_event(0x12, 0, 0, 0)  # ALT down helps bypass foreground lock
+        user32.ShowWindow(hwnd, 9)  # SW_RESTORE
+        user32.SetForegroundWindow(hwnd)
+        user32.keybd_event(0x12, 0, 0x0002, 0)  # ALT up
+        return True
+
+    def _activate_x11(self, hints) -> bool:
+        import shutil
+        import subprocess
+
+        for tool_args in (("wmctrl", "-a"), ("xdotool", "search", "--name")):
+            if not shutil.which(tool_args[0]):
+                continue
+            for h in hints:
+                cmd = list(tool_args) + [h]
+                if tool_args[0] == "xdotool":
+                    cmd += ["windowactivate"]
+                try:
+                    if subprocess.run(cmd, capture_output=True, timeout=2).returncode == 0:
+                        return True
+                except Exception:
+                    pass
+        return False
+
     def wait_for(self, substrings, timeout: float = 5.0) -> bool:
         """Poll until the foreground title contains any of ``substrings``."""
         if self._dry_run:

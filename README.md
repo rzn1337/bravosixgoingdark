@@ -75,9 +75,10 @@ sudo systemctl enable --now ydotool    # start the input daemon
 **Stop a run:** `Ctrl+Alt+Q` (Windows / X11), slam the mouse to the top-left
 corner, `Ctrl+C`, or from any terminal: `touch ~/.b6gd_stop`.
 
-**Common flags:** `--duration 30m|1h|90s` · `--activities write,browse,idle,switch`
+**Common flags:** `--duration 30m|1h|90s` · `--activities write,browse,idle,switch,watch`
+· `--exclude write,watch` (turn features off) · `-i` (choose features interactively)
 · `--sandbox <dir>` · `--seed 42` · `--config file.json` · `--log-level DEBUG`
-· `--assume-focus` (Wayland typing).
+· `--strict-focus` (require verified focus before typing).
 
 **Where output goes:** generated notes land in `~/B6GDWorkspace/Notes/`
 (`%USERPROFILE%\B6GDWorkspace\Notes\` on Windows).
@@ -207,7 +208,9 @@ CLI ─▶ Session ─▶ Scheduler ─▶ Activity ─▶ Executor ─▶ Input
   that executes nothing.
 - **Humanization** (`humanize/`): pure functions that turn intent into
   waypoints and keystroke timings. Unit-tested, no display required.
-- **Activities** (`activities/`): `write`, `browse`, `idle`, `switch`.
+- **Activities** (`activities/`): `write` (types a note, never saved), `browse`,
+  `idle`, `switch`, `watch` (opens YouTube on GoHighLevel / CRM / n8n topics).
+  Pick which run with `--activities` / `--exclude` / `-i`.
 - **Engine** (`engine/`): the `Executor` drives primitives through the
   humanizer and the `Control` (pause/stop) object; the `Scheduler` picks the
   next activity; the `Session` runs the loop.
