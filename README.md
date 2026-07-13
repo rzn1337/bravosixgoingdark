@@ -81,13 +81,10 @@ with the same flags.
 **4. Pick interactively before it starts — `-i` / `--interactive`:**
 ```bash
 ./b6gd-linux run -i
-# It prints a checklist; type names to TOGGLE, then Enter to start:
-#   [x] write
-#   [x] browse
-#   [x] idle
-#   [x] switch
-#   [x] watch
-# > browse,switch        <- turns those two off, then starts
+# It lists the features; type the ones you want to RUN, then press Enter:
+#   Available features: write, browse, idle, switch, watch
+#   > browse idle          <- runs ONLY browse and idle
+#   (press Enter alone to keep the current selection)
 ```
 
 Notes:

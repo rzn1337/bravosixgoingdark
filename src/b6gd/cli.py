@@ -95,25 +95,31 @@ def resolve_activities(all_names, selected, exclude):
     return [n for n in base if n not in ex]
 
 
+def _parse_feature_selection(resp, all_names, preselected):
+    """Interpret the interactive prompt response. Empty keeps ``preselected``;
+    otherwise the typed names ARE the selection (canonical order, unknown names
+    ignored)."""
+    resp = (resp or "").strip()
+    if not resp:
+        return list(preselected)
+    chosen = {t for t in (tok.strip().lower() for tok in resp.replace(",", " ").split()) if t in all_names}
+    return [n for n in all_names if n in chosen]
+
+
 def _interactive_select(all_names, preselected):
     import sys
 
     if not sys.stdin or not sys.stdin.isatty():
         return preselected
-    sel = set(preselected)
-    print("Choose features to run — type names to toggle (comma/space separated),")
-    print("then press Enter to start:")
-    for n in all_names:
-        print("  [%s] %s" % ("x" if n in sel else " ", n))
+    print("Available features:", ", ".join(all_names))
+    print("Selected now    :", ", ".join(preselected) if preselected else "(none)")
+    print("Type the features to RUN (space or comma separated), e.g. `browse idle`.")
+    print("Press Enter alone to keep the current selection.")
     try:
         resp = input("> ").strip()
     except EOFError:
         return preselected
-    for tok in resp.replace(",", " ").split():
-        t = tok.strip().lower()
-        if t in all_names:
-            sel.discard(t) if t in sel else sel.add(t)
-    final = [n for n in all_names if n in sel]
+    final = _parse_feature_selection(resp, all_names, preselected)
     print("Running:", ", ".join(final) if final else "(nothing selected)")
     return final
 

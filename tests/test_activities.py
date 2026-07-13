@@ -1,8 +1,25 @@
 from b6gd.activities import REGISTRY
-from b6gd.cli import resolve_activities
+from b6gd.cli import _parse_feature_selection, resolve_activities
 from b6gd.config import Settings, WatchSettings
 
 ALL = ["write", "browse", "idle", "switch", "watch"]
+
+
+def test_interactive_typed_names_are_the_selection():
+    # Typing names selects exactly those (not a toggle of the default).
+    assert _parse_feature_selection("browse idle", ALL, ALL) == ["browse", "idle"]
+    assert _parse_feature_selection("idle,browse", ALL, ALL) == ["browse", "idle"]
+
+
+def test_interactive_empty_keeps_preselected():
+    assert _parse_feature_selection("", ALL, ["write", "watch"]) == ["write", "watch"]
+
+
+def test_interactive_ignores_unknown():
+    assert _parse_feature_selection("browse bogus watch", ALL, ALL) == [
+        "browse",
+        "watch",
+    ]
 
 
 def test_registry_has_all_including_watch():
