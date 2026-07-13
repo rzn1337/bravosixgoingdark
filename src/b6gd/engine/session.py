@@ -175,13 +175,20 @@ class Session:
         return 0
 
     def _cleanup(self) -> None:
-        if not self.dry_run:
-            self.killswitch.stop()
-            self.takeover.stop()
-            self.stopfile.stop()
-        for proc in self.ctx.tracked:
+        try:
+            if not self.dry_run:
+                self.killswitch.stop()
+                self.takeover.stop()
+                self.stopfile.stop()
+        except Exception:
+            pass
+        for proc in list(self.ctx.tracked):
             try:
                 if proc is not None and proc.poll() is None:
                     proc.terminate()
             except Exception:
                 pass
+        try:
+            self.ctx.tracked.clear()
+        except Exception:
+            pass

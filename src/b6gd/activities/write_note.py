@@ -1,12 +1,12 @@
 from __future__ import annotations
 
-from .base import Activity
+from .base import Activity, close_app, focus_window
 
 
 class WriteNote(Activity):
     """Open the notes editor on a blank document and type a generated note with
-    human rhythm. It never saves — the note is discarded when the editor closes
-    at the end of the session."""
+    human rhythm. It never saves, and it closes the editor afterwards so long
+    runs don't pile up windows."""
 
     name = "write"
 
@@ -25,32 +25,27 @@ class WriteNote(Activity):
             return
 
         hints = ctx.apps.editor_title_hints()
-        ctx.focus.activate(hints)  # best-effort: bring the editor to the front
+        ctx.focus.activate(hints)  # best-effort raise (Windows / X11)
+        focus_window(ctx)  # click-to-focus so keys land in the editor, not the terminal
         if not ctx.exe.wait(rng.uniform(0.3, 0.8)):
+            close_app(ctx, proc, ctrl_w=False)
             return
 
         assume = getattr(ctx.settings, "assume_focus", True)
         if ctx.focus.can_detect():
-            if not ctx.focus.wait_for(hints, timeout=6.0):
-                if not assume:
-                    ctx.log.warning("write: editor not in foreground — skipping typing.")
-                    return
-                ctx.log.warning(
-                    "write: editor not confirmed in front; typing anyway (assume_focus)."
-                )
+            if not ctx.focus.wait_for(hints, timeout=6.0) and not assume:
+                ctx.log.warning("write: editor not in foreground — skipping typing.")
+                close_app(ctx, proc, ctrl_w=False)
+                return
         elif not assume:
             ctx.log.warning(
-                "write: can't verify window focus (e.g. Wayland) and --strict-focus is "
-                "set — skipping typing."
+                "write: can't verify window focus and --strict-focus is set — skipping."
             )
+            close_app(ctx, proc, ctrl_w=False)
             return
-        else:
-            ctx.log.info(
-                "write: focus not verifiable here (e.g. Wayland) — typing into the "
-                "editor just launched."
-            )
 
         text = ctx.content.make_note()
         ctx.log.info("write: typing note (%d chars); not saving", len(text))
         ctx.exe.type_text(text)
-        ctx.exe.wait(rng.uniform(1.0, 3.0))
+        ctx.exe.wait(rng.uniform(1.0, 2.5))
+        close_app(ctx, proc, ctrl_w=False)  # discard via terminate (no save prompt)

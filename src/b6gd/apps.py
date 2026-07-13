@@ -69,7 +69,13 @@ class Apps:
 
     def _popen(self, cmd):
         try:
-            return subprocess.Popen(cmd, env=self._child_env())
+            return subprocess.Popen(
+                cmd,
+                env=self._child_env(),
+                stdout=subprocess.DEVNULL,
+                stderr=subprocess.DEVNULL,
+                start_new_session=True,  # detach: our Ctrl+C won't hit the child
+            )
         except Exception as exc:
             self.log.warning("Failed to launch %s: %s", cmd, exc)
             return None

@@ -1,12 +1,11 @@
 from __future__ import annotations
 
-from .base import Activity
+from .base import Activity, close_app, focus_window
 
 
 class BrowseFolders(Activity):
-    """Open the file manager at the sandbox root and move around it — hovering,
-    occasionally double-clicking to open a folder, scrolling, and going back.
-    Stays within the sandbox; double-clicking empty space is harmless."""
+    """Open the file manager at the sandbox root, move around it, then close it so
+    long runs don't accumulate file-manager windows."""
 
     name = "browse"
 
@@ -26,16 +25,17 @@ class BrowseFolders(Activity):
 
         if not ctx.exe.wait(rng.uniform(1.5, 3.0)):
             return
+        focus_window(ctx)
 
         w, h = ctx.screen_size
         for _ in range(rng.randint(2, 4)):
             if ctx.control.stopped():
-                return
+                break
             x = rng.randint(int(w * 0.18), int(w * 0.55))
             y = rng.randint(int(h * 0.25), int(h * 0.70))
             ctx.log.info("browse: look around (%d, %d)", x, y)
             if not ctx.exe.move_to(x, y):
-                return
+                break
             if rng.random() < 0.5:
                 ctx.exe.double_click()
                 ctx.exe.wait(rng.uniform(0.8, 1.8))
@@ -46,4 +46,6 @@ class BrowseFolders(Activity):
                 ctx.log.info("browse: back")
                 ctx.exe.hotkey("alt", "left")
             if not ctx.exe.wait(rng.uniform(0.6, 1.8)):
-                return
+                break
+
+        close_app(ctx, proc, ctrl_w=True)

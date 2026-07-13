@@ -189,7 +189,10 @@ def _run_session(settings, dry_run: bool) -> int:
     except BackendUnavailable as exc:
         print(str(exc), file=sys.stderr)
         return 2
-    return session.run()
+    try:
+        return session.run()
+    except KeyboardInterrupt:
+        return 0
 
 
 def main(argv=None) -> int:

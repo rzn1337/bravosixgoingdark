@@ -1,12 +1,11 @@
 from __future__ import annotations
 
-from .base import Activity
+from .base import Activity, close_app, focus_window
 
 
 class WatchVideo(Activity):
-    """Open the browser to a YouTube search on the configured topics (GoHighLevel,
-    CRM automation, n8n workflows, ...) and 'watch' — dwell for a while with the
-    occasional scroll and small mouse move, like someone following a video."""
+    """Open the browser to a YouTube search on the configured topics and watch —
+    dwell with occasional scrolls — then close the tab so tabs don't pile up."""
 
     name = "watch"
 
@@ -25,6 +24,7 @@ class WatchVideo(Activity):
         if not ctx.exe.wait(rng.uniform(3.0, 6.0)):  # let the page load
             return
         ctx.focus.activate(ctx.apps.browser_title_hints())
+        focus_window(ctx)  # focus the browser (and often lands on a video)
 
         dwell = rng.uniform(watch.dwell_min_s, watch.dwell_max_s)
         ctx.log.info("watch: watching for ~%ds", int(dwell))
@@ -33,7 +33,7 @@ class WatchVideo(Activity):
         while remaining > 0 and not ctx.control.stopped():
             step = min(remaining, rng.uniform(6.0, 16.0))
             if not ctx.exe.wait(step):
-                return
+                break
             remaining -= step
             roll = rng.random()
             if roll < 0.35:
@@ -43,3 +43,5 @@ class WatchVideo(Activity):
                     rng.randint(int(w * 0.2), int(w * 0.75)),
                     rng.randint(int(h * 0.2), int(h * 0.7)),
                 )
+
+        close_app(ctx, proc, ctrl_w=True)
