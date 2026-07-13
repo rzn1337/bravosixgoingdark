@@ -2,7 +2,7 @@ from b6gd.activities import REGISTRY
 from b6gd.cli import _parse_feature_selection, resolve_activities
 from b6gd.config import Settings, WatchSettings
 
-ALL = ["write", "browse", "idle", "switch", "watch"]
+ALL = ["write", "browse", "idle", "switch", "watch", "click"]
 
 
 def test_interactive_typed_names_are_the_selection():
@@ -36,6 +36,7 @@ def test_resolve_exclude_removes():
         "write",
         "idle",
         "watch",
+        "click",
     ]
 
 

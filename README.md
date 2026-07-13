@@ -54,6 +54,7 @@ B6GD has five features. Enable or disable any of them per run.
 | `idle`   | Drifts the cursor and scrolls, like reading or thinking.            |
 | `switch` | Alt-Tabs between open windows.                                      |
 | `watch`  | Opens the browser to a YouTube search (GoHighLevel / CRM / n8n) and watches. |
+| `click`  | Left-clicks random spots in a safe central zone (avoids edges/controls).     |
 
 There are three ways to choose what runs. They work with both `run` and
 `dry-run`. Examples use the Linux binary; on Windows use `.\b6gd-windows.exe`
@@ -128,10 +129,10 @@ sudo systemctl enable --now ydotool    # start the input daemon
 **Stop a run:** `Ctrl+Alt+Q` (Windows / X11), slam the mouse to the top-left
 corner, `Ctrl+C`, or from any terminal: `touch ~/.b6gd_stop`.
 
-**Common flags:** `--duration 30m|1h|90s` · `--activities write,browse,idle,switch,watch`
+**Common flags:** `--duration 30m|1h|90s` · `--activities write,browse,idle,switch,watch,click`
 · `--exclude write,watch` (turn features off) · `-i` (choose features interactively)
-· `--sandbox <dir>` · `--seed 42` · `--config file.json` · `--log-level DEBUG`
-· `--strict-focus` (require verified focus before typing).
+· `--order shuffle|weighted` (default shuffle = equal & random) · `--sandbox <dir>`
+· `--seed 42` · `--config file.json` · `--log-level DEBUG` · `--strict-focus`.
 
 **Where output goes:** generated notes land in `~/B6GDWorkspace/Notes/`
 (`%USERPROFILE%\B6GDWorkspace\Notes\` on Windows).
@@ -262,8 +263,9 @@ CLI ─▶ Session ─▶ Scheduler ─▶ Activity ─▶ Executor ─▶ Input
 - **Humanization** (`humanize/`): pure functions that turn intent into
   waypoints and keystroke timings. Unit-tested, no display required.
 - **Activities** (`activities/`): `write` (types a note, never saved), `browse`,
-  `idle`, `switch`, `watch` (opens YouTube on GoHighLevel / CRM / n8n topics).
-  Pick which run with `--activities` / `--exclude` / `-i`.
+  `idle`, `switch`, `watch` (YouTube on GoHighLevel / CRM / n8n topics), `click`
+  (random safe-zone clicks). Pick which run with `--activities` / `--exclude` /
+  `-i`; order them with `--order shuffle|weighted`.
 - **Engine** (`engine/`): the `Executor` drives primitives through the
   humanizer and the `Control` (pause/stop) object; the `Scheduler` picks the
   next activity; the `Session` runs the loop.

@@ -32,7 +32,8 @@ class ScheduleSettings:
     break_chance: float = 0.15  # chance of a longer break after an activity
     break_min_s: float = 5.0
     break_max_s: float = 25.0
-    repeat_penalty: float = 0.35  # weight multiplier for repeating the last activity
+    repeat_penalty: float = 0.35  # weight multiplier for repeating (weighted mode only)
+    order: str = "shuffle"  # "shuffle" = equal frequency, random order; "weighted" = by weight
 
 
 @dataclass
@@ -54,7 +55,7 @@ class WatchSettings:
 class Settings:
     duration_s: float = 1800.0
     activities: list = field(
-        default_factory=lambda: ["write", "browse", "idle", "switch", "watch"]
+        default_factory=lambda: ["write", "browse", "idle", "switch", "watch", "click"]
     )
     activity_weights: dict = field(
         default_factory=lambda: {
@@ -63,6 +64,7 @@ class Settings:
             "idle": 2,
             "switch": 1,
             "watch": 2,
+            "click": 2,
         }
     )
     sandbox_dir: str = ""  # empty => default ~/B6GDWorkspace
@@ -73,6 +75,7 @@ class Settings:
     editor_cmd: str = ""  # override editor auto-detection
     filemanager_cmd: str = ""  # override file-manager auto-detection
     assume_focus: bool = True  # type even when window focus can't be verified (e.g. Wayland)
+    click_safe_margin: float = 0.15  # inset (fraction) for the random-click safe zone
     seed: int = 0  # 0 => nondeterministic
     mouse: MouseSettings = field(default_factory=MouseSettings)
     typing: TypingSettings = field(default_factory=TypingSettings)

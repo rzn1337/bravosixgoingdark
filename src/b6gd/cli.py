@@ -55,6 +55,11 @@ def build_parser() -> argparse.ArgumentParser:
             default=None,
             help="only type when the editor's focus is verified (disables Wayland typing)",
         )
+        sp.add_argument(
+            "--order",
+            choices=["shuffle", "weighted"],
+            help="activity order: shuffle = equal & random (default), weighted = by weight",
+        )
 
     add_common(sub.add_parser("run", help="live session (moves the real cursor/keyboard)"))
     add_common(
@@ -84,6 +89,8 @@ def _apply_overrides(settings, args):
         settings.assume_focus = True
     if getattr(args, "strict_focus", None):
         settings.assume_focus = False
+    if getattr(args, "order", None):
+        settings.schedule.order = args.order
     return settings
 
 
