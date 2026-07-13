@@ -43,6 +43,62 @@ Notes:
 The executables are built automatically by GitHub Actions whenever a version tag
 (`v*`) is pushed — see [`.github/workflows/release.yml`](.github/workflows/release.yml).
 
+## Run configurations (choose which features run)
+
+B6GD has five features. Enable or disable any of them per run.
+
+| Feature  | What it does                                                        |
+|----------|---------------------------------------------------------------------|
+| `write`  | Opens a **blank** note editor and types a note (**never saved**).   |
+| `browse` | Opens the file manager and navigates around the sandbox folder.     |
+| `idle`   | Drifts the cursor and scrolls, like reading or thinking.            |
+| `switch` | Alt-Tabs between open windows.                                      |
+| `watch`  | Opens the browser to a YouTube search (GoHighLevel / CRM / n8n) and watches. |
+
+There are three ways to choose what runs. They work with both `run` and
+`dry-run`. Examples use the Linux binary; on Windows use `.\b6gd-windows.exe`
+with the same flags.
+
+**1. Everything (default) — just don't pass a feature flag:**
+```bash
+./b6gd-linux run --duration 10m
+```
+
+**2. Only specific features — `--activities` (comma list):**
+```bash
+./b6gd-linux run --activities write                 # only type notes
+./b6gd-linux run --activities watch                 # only watch YouTube
+./b6gd-linux run --activities write,watch           # type + watch
+./b6gd-linux run --activities browse,idle,switch    # move around only
+```
+
+**3. Everything EXCEPT some features — `--exclude` (comma list):**
+```bash
+./b6gd-linux run --exclude watch                    # everything but the browser
+./b6gd-linux run --exclude write,browse             # no typing, no file manager
+```
+
+**4. Pick interactively before it starts — `-i` / `--interactive`:**
+```bash
+./b6gd-linux run -i
+# It prints a checklist; type names to TOGGLE, then Enter to start:
+#   [x] write
+#   [x] browse
+#   [x] idle
+#   [x] switch
+#   [x] watch
+# > browse,switch        <- turns those two off, then starts
+```
+
+Notes:
+- Unknown names are ignored, and `--exclude` is applied after `--activities`
+  (so exclude wins).
+- Point `watch` at **specific videos** with a config file:
+  `--config my.json` where `my.json` is
+  `{ "watch": { "urls": ["https://www.youtube.com/watch?v=VIDEO_ID"] } }`.
+- On Wayland, `write` types by default; add `--strict-focus` to type only when
+  the editor's focus can be verified.
+
 ## Command reference
 
 Same three verbs everywhere: **`doctor`** (check setup) → **`dry-run`** (safe
