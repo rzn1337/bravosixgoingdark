@@ -5,4 +5,4 @@ Personal-use tool that produces believable, human-like desktop activity
 with a near-zero dependency footprint and a hard safety story.
 """
 
-__version__ = "0.5.1"
+__version__ = "0.6.0"

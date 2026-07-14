@@ -69,6 +69,24 @@ def build_parser() -> argparse.ArgumentParser:
     doc.add_argument("--config")
     doc.add_argument("--sandbox")
 
+    cp = sub.add_parser("click-point", help="repeatedly click one fixed (x, y) point")
+    cp.add_argument("--x", type=int, required=True, help="x coordinate in pixels")
+    cp.add_argument("--y", type=int, required=True, help="y coordinate in pixels")
+    cp.add_argument(
+        "--interval", type=float, default=1.0, help="seconds between clicks (default 1.0)"
+    )
+    cp.add_argument(
+        "--count", type=int, default=0, help="number of clicks (0 = until stopped)"
+    )
+    cp.add_argument("--duration", help="run for this long, e.g. 5m (optional)")
+    cp.add_argument("--button", choices=["left", "right", "middle"], default="left")
+    cp.add_argument(
+        "--dry-run", action="store_true", help="log the clicks without performing them"
+    )
+    cp.add_argument("--config")
+    cp.add_argument("--killswitch")
+    cp.add_argument("--log-level")
+
     return p
 
 
@@ -210,6 +228,30 @@ def _run_session(settings, dry_run: bool) -> int:
         return 0
 
 
+def cmd_click_point(settings, args) -> int:
+    from .engine.clickpoint import ClickPointRunner
+
+    duration = parse_duration(args.duration) if getattr(args, "duration", None) else 0.0
+    try:
+        runner = ClickPointRunner(
+            settings,
+            x=args.x,
+            y=args.y,
+            interval=args.interval,
+            count=args.count,
+            duration=duration,
+            button=args.button,
+            dry_run=args.dry_run,
+        )
+    except BackendUnavailable as exc:
+        print(str(exc), file=sys.stderr)
+        return 2
+    try:
+        return runner.run()
+    except KeyboardInterrupt:
+        return 0
+
+
 def main(argv=None) -> int:
     args = build_parser().parse_args(argv)
     settings = load_settings(getattr(args, "config", None))
@@ -218,6 +260,8 @@ def main(argv=None) -> int:
 
     if args.command == "doctor":
         return cmd_doctor(settings)
+    if args.command == "click-point":
+        return cmd_click_point(settings, args)
 
     from .activities import REGISTRY
 

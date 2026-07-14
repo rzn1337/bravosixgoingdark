@@ -138,6 +138,22 @@ corner, `Ctrl+C`, or from any terminal: `touch ~/.b6gd_stop`.
 **Where output goes:** generated notes land in `~/B6GDWorkspace/Notes/`
 (`%USERPROFILE%\B6GDWorkspace\Notes\` on Windows).
 
+## Fixed-point auto-clicker (`click-point`)
+
+Repeatedly click one fixed screen coordinate:
+
+```bash
+./b6gd-linux click-point --x 500 --y 300                 # click (500,300) once a second, until stopped
+./b6gd-linux click-point --x 500 --y 300 --interval 0.25 # ~4 clicks per second
+./b6gd-linux click-point --x 500 --y 300 --count 100     # exactly 100 clicks
+./b6gd-linux click-point --x 500 --y 300 --duration 5m   # for 5 minutes
+./b6gd-linux click-point --x 500 --y 300 --button right  # right-click instead
+./b6gd-linux click-point --x 500 --y 300 --dry-run       # preview: log clicks, don't perform them
+```
+
+Stops: `Ctrl`+`Alt`+`Q` (Windows / X11), `Ctrl`+`C`, or `touch ~/.b6gd_stop`. On
+Windows use `.\b6gd-windows.exe click-point --x … --y …`.
+
 ## Design goals
 
 - **Lightweight.** Exactly one third-party dependency (`pynput`); everything

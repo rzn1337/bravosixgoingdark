@@ -52,6 +52,20 @@ class Executor:
     def move_click(self, x: int, y: int, button: str = "left") -> bool:
         return self.move_to(x, y) and self.click(button)
 
+    def click_at(self, x: int, y: int, button: str = "left") -> bool:
+        """Jump straight to (x, y) and click — no humanized path. Used by the
+        fixed-point auto-clicker."""
+        if not self.c.check():
+            return False
+        self.c.begin_injection()
+        try:
+            self.b.move(int(x), int(y))
+            self.c.expected_pos = (int(x), int(y))
+            self.b.click(button)
+        finally:
+            self.c.end_injection()
+        return not self.c.stopped()
+
     def scroll(self, clicks: int) -> bool:
         step = 1 if clicks > 0 else -1
         self.c.begin_injection()
