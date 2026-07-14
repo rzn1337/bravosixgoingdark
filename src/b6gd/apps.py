@@ -162,6 +162,39 @@ class Apps:
             return None
         return self._popen([self.terminal])
 
+    def launch_terminal_run(self, posix_script: str, windows_script: str):
+        """Open a terminal that RUNS ``script`` and closes when it finishes.
+        Unlike typing into a terminal (which needs keyboard focus we can't get on
+        Wayland), the commands actually run in the new window with no focus."""
+        if self.dry_run:
+            self.log.info("[dry] would open a terminal running: %s", posix_script)
+            return None
+        if self.info.is_windows:
+            return self._popen(["cmd", "/c", "start", "", "cmd", "/c", windows_script])
+        if self.info.is_mac:
+            script = posix_script.replace("\\", "\\\\").replace('"', '\\"')
+            return self._popen(
+                ["osascript", "-e", f'tell application "Terminal" to do script "{script}"']
+            )
+        term = self.terminal
+        if not term:
+            self.log.warning(
+                "No terminal emulator found. Install one of: %s",
+                ", ".join(_LINUX_TERMINALS),
+            )
+            return None
+        inner = ["bash", "-c", posix_script]
+        base = os.path.basename(term)
+        if base in ("gnome-terminal", "mate-terminal", "tilix"):
+            argv = [term, "--", *inner]
+        elif base == "xfce4-terminal":
+            argv = [term, "-x", *inner]
+        elif base == "kitty":
+            argv = [term, *inner]
+        else:  # konsole, xterm, x-terminal-emulator, alacritty, and fallback
+            argv = [term, "-e", *inner]
+        return self._popen(argv)
+
     # ---- focus hints --------------------------------------------------
     def editor_title_hints(self, filepath: str | None = None):
         hints = []

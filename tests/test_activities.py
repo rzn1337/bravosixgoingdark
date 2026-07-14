@@ -1,4 +1,7 @@
+import random
+
 from b6gd.activities import REGISTRY
+from b6gd.activities.terminal_work import _posix_script, _windows_script
 from b6gd.cli import _parse_feature_selection, resolve_activities
 from b6gd.config import Settings, TerminalSettings, WatchSettings
 
@@ -47,6 +50,14 @@ def test_terminal_feature_and_settings():
     assert "terminal" in REGISTRY
     t = TerminalSettings()
     assert t.min_cmds <= t.max_cmds
+
+
+def test_terminal_scripts_run_the_commands():
+    rng = random.Random(0)
+    s = _posix_script(["ls", "echo hi"], rng)
+    assert "ls" in s and "echo hi" in s and "sleep" in s
+    w = _windows_script(["dir", "echo hi"], rng)
+    assert "dir" in w and "timeout" in w
 
 
 def test_resolve_selected_then_exclude():
