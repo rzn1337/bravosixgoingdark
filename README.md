@@ -55,6 +55,7 @@ B6GD has five features. Enable or disable any of them per run.
 | `switch` | Alt-Tabs between open windows.                                      |
 | `watch`  | Opens the browser to a YouTube search (GoHighLevel / CRM / n8n) and watches. |
 | `click`  | Left-clicks random spots in a safe central zone (avoids edges/controls).     |
+| `terminal` | Opens a NEW terminal, runs benign read-only commands (ls, echo, date…) with safe clicks, then closes it. |
 
 There are three ways to choose what runs. They work with both `run` and
 `dry-run`. Examples use the Linux binary; on Windows use `.\b6gd-windows.exe`
@@ -129,7 +130,7 @@ sudo systemctl enable --now ydotool    # start the input daemon
 **Stop a run:** `Ctrl+Alt+Q` (Windows / X11), slam the mouse to the top-left
 corner, `Ctrl+C`, or from any terminal: `touch ~/.b6gd_stop`.
 
-**Common flags:** `--duration 30m|1h|90s` · `--activities write,browse,idle,switch,watch,click`
+**Common flags:** `--duration 30m|1h|90s` · `--activities write,browse,idle,switch,watch,click,terminal`
 · `--exclude write,watch` (turn features off) · `-i` (choose features interactively)
 · `--order shuffle|weighted` (default shuffle = equal & random) · `--sandbox <dir>`
 · `--seed 42` · `--config file.json` · `--log-level DEBUG` · `--strict-focus`.
@@ -264,8 +265,9 @@ CLI ─▶ Session ─▶ Scheduler ─▶ Activity ─▶ Executor ─▶ Input
   waypoints and keystroke timings. Unit-tested, no display required.
 - **Activities** (`activities/`): `write` (types a note, never saved), `browse`,
   `idle`, `switch`, `watch` (YouTube on GoHighLevel / CRM / n8n topics), `click`
-  (random safe-zone clicks). Pick which run with `--activities` / `--exclude` /
-  `-i`; order them with `--order shuffle|weighted`.
+  (random safe-zone clicks), `terminal` (opens a terminal, runs benign commands
+  with safe clicks, then closes it). Pick which run with `--activities` /
+  `--exclude` / `-i`; order them with `--order shuffle|weighted`.
 - **Engine** (`engine/`): the `Executor` drives primitives through the
   humanizer and the `Control` (pause/stop) object; the `Scheduler` picks the
   next activity; the `Session` runs the loop.

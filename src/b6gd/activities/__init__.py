@@ -3,6 +3,7 @@ from .browse_folders import BrowseFolders
 from .idle import IdleWander
 from .random_click import RandomClick
 from .switch_windows import SwitchWindows
+from .terminal_work import TerminalWork
 from .watch_video import WatchVideo
 from .write_note import WriteNote
 
@@ -15,6 +16,7 @@ REGISTRY = {
         SwitchWindows,
         WatchVideo,
         RandomClick,
+        TerminalWork,
     )
 }
 
@@ -26,5 +28,6 @@ __all__ = [
     "SwitchWindows",
     "WatchVideo",
     "RandomClick",
+    "TerminalWork",
     "REGISTRY",
 ]

@@ -9,6 +9,17 @@ from .platform_detect import PlatformInfo
 
 _LINUX_EDITORS = ["gnome-text-editor", "gedit", "kate", "mousepad", "xed", "leafpad"]
 _LINUX_FILES = ["nautilus", "nemo", "dolphin", "thunar", "pcmanfm", "caja"]
+_LINUX_TERMINALS = [
+    "gnome-terminal",
+    "konsole",
+    "xfce4-terminal",
+    "mate-terminal",
+    "tilix",
+    "kitty",
+    "alacritty",
+    "x-terminal-emulator",
+    "xterm",
+]
 
 
 def find_editor(info: PlatformInfo, override: str = "") -> str:
@@ -37,6 +48,19 @@ def find_filemanager(info: PlatformInfo, override: str = "") -> str:
     return "xdg-open"
 
 
+def find_terminal(info: PlatformInfo, override: str = "") -> str:
+    if override:
+        return override
+    if info.is_windows:
+        return "cmd.exe"
+    if info.is_mac:
+        return "Terminal"
+    for cand in _LINUX_TERMINALS:
+        if shutil.which(cand):
+            return cand
+    return ""
+
+
 class Apps:
     """Discovers and launches the notes editor and file manager per OS, and
     supplies window-title hints so the focus guard can confirm the right app
@@ -48,6 +72,7 @@ class Apps:
         self.dry_run = dry_run
         self.editor = find_editor(info, settings.editor_cmd)
         self.filemanager = find_filemanager(info, settings.filemanager_cmd)
+        self.terminal = find_terminal(info, settings.terminal_cmd)
 
     # ---- launch -------------------------------------------------------
     @staticmethod
@@ -120,6 +145,23 @@ class Apps:
             return self._popen(["open", url])
         return self._popen(["xdg-open", url])
 
+    def launch_terminal(self):
+        if self.dry_run:
+            self.log.info("[dry] would open a terminal (%s)", self.terminal or "default")
+            return None
+        if self.info.is_windows:
+            # A new, interactive console window we can type into.
+            return self._popen(["cmd", "/c", "start", "", "cmd"])
+        if self.info.is_mac:
+            return self._popen(["open", "-a", "Terminal"])
+        if not self.terminal:
+            self.log.warning(
+                "No terminal emulator found. Install one of: %s",
+                ", ".join(_LINUX_TERMINALS),
+            )
+            return None
+        return self._popen([self.terminal])
+
     # ---- focus hints --------------------------------------------------
     def editor_title_hints(self, filepath: str | None = None):
         hints = []
@@ -153,3 +195,10 @@ class Apps:
             "Brave",
             "Opera",
         ]
+
+    def terminal_title_hints(self):
+        if self.info.is_windows:
+            return ["cmd", "Command Prompt", "PowerShell", "Terminal"]
+        if self.info.is_mac:
+            return ["Terminal"]
+        return ["Terminal", "gnome-terminal", "Konsole", "xterm", "bash", "zsh"]

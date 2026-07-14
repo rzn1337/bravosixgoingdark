@@ -1,8 +1,8 @@
 from b6gd.activities import REGISTRY
 from b6gd.cli import _parse_feature_selection, resolve_activities
-from b6gd.config import Settings, WatchSettings
+from b6gd.config import Settings, TerminalSettings, WatchSettings
 
-ALL = ["write", "browse", "idle", "switch", "watch", "click"]
+ALL = ["write", "browse", "idle", "switch", "watch", "click", "terminal"]
 
 
 def test_interactive_typed_names_are_the_selection():
@@ -37,7 +37,16 @@ def test_resolve_exclude_removes():
         "idle",
         "watch",
         "click",
+        "terminal",
     ]
+
+
+def test_terminal_feature_and_settings():
+    s = Settings()
+    assert "terminal" in s.activities
+    assert "terminal" in REGISTRY
+    t = TerminalSettings()
+    assert t.min_cmds <= t.max_cmds
 
 
 def test_resolve_selected_then_exclude():

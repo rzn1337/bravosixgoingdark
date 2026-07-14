@@ -52,10 +52,25 @@ class WatchSettings:
 
 
 @dataclass
+class TerminalSettings:
+    min_cmds: int = 2  # how many commands per terminal session
+    max_cmds: int = 5
+    commands: list = field(default_factory=list)  # empty => built-in benign per-OS list
+
+
+@dataclass
 class Settings:
     duration_s: float = 1800.0
     activities: list = field(
-        default_factory=lambda: ["write", "browse", "idle", "switch", "watch", "click"]
+        default_factory=lambda: [
+            "write",
+            "browse",
+            "idle",
+            "switch",
+            "watch",
+            "click",
+            "terminal",
+        ]
     )
     activity_weights: dict = field(
         default_factory=lambda: {
@@ -65,6 +80,7 @@ class Settings:
             "switch": 1,
             "watch": 2,
             "click": 2,
+            "terminal": 2,
         }
     )
     sandbox_dir: str = ""  # empty => default ~/B6GDWorkspace
@@ -74,6 +90,7 @@ class Settings:
     logfile: str = ""
     editor_cmd: str = ""  # override editor auto-detection
     filemanager_cmd: str = ""  # override file-manager auto-detection
+    terminal_cmd: str = ""  # override terminal auto-detection
     assume_focus: bool = True  # type even when window focus can't be verified (e.g. Wayland)
     click_safe_margin: float = 0.15  # inset (fraction) for the random-click safe zone
     seed: int = 0  # 0 => nondeterministic
@@ -81,6 +98,7 @@ class Settings:
     typing: TypingSettings = field(default_factory=TypingSettings)
     schedule: ScheduleSettings = field(default_factory=ScheduleSettings)
     watch: WatchSettings = field(default_factory=WatchSettings)
+    terminal: TerminalSettings = field(default_factory=TerminalSettings)
 
 
 def default_sandbox() -> str:

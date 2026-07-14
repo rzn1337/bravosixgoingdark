@@ -6,7 +6,7 @@ import platform
 import sys
 
 from . import __version__
-from .apps import find_editor, find_filemanager
+from .apps import find_editor, find_filemanager, find_terminal
 from .backends import BackendUnavailable, describe_backend
 from .config import load_settings
 from .platform_detect import detect
@@ -144,6 +144,7 @@ def cmd_doctor(settings) -> int:
 
     editor = find_editor(info, settings.editor_cmd) or "(none found)"
     fm = find_filemanager(info, settings.filemanager_cmd) or "(none found)"
+    term = find_terminal(info, settings.terminal_cmd) or "(none found)"
     w, h = get_screen_size(info)
 
     lines = [
@@ -159,6 +160,7 @@ def cmd_doctor(settings) -> int:
         f"screen size    : {w}x{h}",
         f"editor         : {editor}",
         f"file manager   : {fm}",
+        f"terminal       : {term}",
         f"sandbox        : {settings.sandbox_dir}",
         f"kill-switch    : {settings.killswitch}",
     ]
